@@ -3,325 +3,562 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Campaign Manager - Trugydex</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <title>TrugyDex - Regulatory Circular Platform</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        :root{--primary-blue:#003087;--primary-green:#2E7D32;--secondary-blue:#1a4a8f;--light-blue:#f0f4f9;--light-green:#f1f8f4;--text-primary:#1a1a1a;--text-secondary:#666666;--border-color:#e0e0e0;--success-color:#2E7D32;--error-color:#ef4444}
-        body{font-family:'DM Sans',sans-serif;background:#f8f9fa;color:var(--text-primary);line-height:1.6}
-        .login-container{min-height:100vh;background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);display:flex;align-items:center;justify-content:center;padding:2rem}
-        .login-card{background:white;border-radius:16px;padding:3rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,48,135,0.2)}
-        .login-tabs{display:flex;margin-bottom:2rem;border-bottom:2px solid var(--border-color)}
-        .login-tab-btn{flex:1;padding:12px;background:transparent;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;transition:all 0.3s}
-        .login-tab-btn.active{color:var(--primary-blue);border-bottom-color:var(--primary-blue)}
-        .login-form{display:none}.login-form.active{display:block}
-        .form-group{margin-bottom:1.5rem}
-        .form-label{display:block;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--primary-blue);text-transform:uppercase;letter-spacing:0.5px}
-        input[type="text"],input[type="email"],input[type="password"],input[type="number"],textarea,select{width:100%;padding:12px 14px;border:2px solid var(--border-color);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;transition:all 0.3s;background:white}
-        input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 4px rgba(0,48,135,0.1)}
-        textarea{resize:vertical;min-height:120px}
-        .button-login{width:100%;padding:12px;background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);color:white;border:none;border-radius:8px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;transition:all 0.3s;margin-top:1rem}
-        .dashboard{background:white;min-height:100vh;display:none}.dashboard.active{display:block}
-        .top-bar{background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
-        .top-bar-user{display:flex;align-items:center;gap:12px}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(46,125,50,0.3);display:flex;align-items:center;justify-content:center;font-weight:700}
-        .user-info .name{font-weight:600;font-size:13px}.user-info .role{font-size:11px;opacity:0.8}
-        .logout-btn{padding:8px 16px;background:rgba(255,255,255,0.2);color:white;border:2px solid white;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.3s}
-        .logout-btn:hover{background:white;color:var(--primary-blue)}
-        .header{background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);color:white;padding:2.5rem 2rem}
-        .header h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;margin-bottom:0.5rem}
-        .container{padding:0 2rem 2rem;max-width:1400px;margin:0 auto}
-        .nav-tabs{display:flex;border-bottom:2px solid var(--border-color);margin:0 -2rem 2rem;padding:0 2rem;overflow-x:auto;background:white}
-        .nav-tab{padding:16px 24px;background:transparent;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;transition:all 0.3s;white-space:nowrap}
-        .nav-tab.active{color:var(--primary-blue);border-bottom-color:var(--primary-blue)}
-        .tab-panel{display:none}.tab-panel.active{display:block}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
-        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem}
-        .card{background:white;border:1px solid var(--border-color);border-radius:12px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
-        .card-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:1.5rem;color:var(--primary-blue);border-bottom:2px solid var(--light-blue);padding-bottom:1rem}
-        .stat-card{background:linear-gradient(135deg,var(--light-blue) 0%,var(--light-green) 100%);border-radius:12px;padding:1.5rem;border:2px solid var(--border-color);text-align:center}
-        .stat-label{font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;font-weight:700}
-        .stat-value{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--primary-blue)}
-        .alert{padding:14px 16px;border-radius:8px;margin-bottom:1.5rem;font-size:13px;border-left:4px solid}
-        .alert-info{background:#eff6ff;color:var(--primary-blue);border-color:var(--primary-blue)}
-        .upload-zone{border:3px dashed var(--primary-blue);border-radius:12px;padding:3rem 2rem;text-align:center;background:var(--light-blue);cursor:pointer;transition:all 0.3s;margin-bottom:1.5rem}
-        .upload-zone:hover,.upload-zone.dragover{background:linear-gradient(135deg,var(--light-blue) 0%,var(--light-green) 100%);border-color:var(--primary-green)}
-        .upload-zone-icon{font-size:3rem;margin-bottom:1rem}
-        .preview-table-container{background:white;border:1px solid var(--border-color);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;max-height:400px;overflow-y:auto}
-        .table-header{background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);color:white;padding:1rem 1.5rem;font-weight:600;font-size:14px}
-        .preview-table{width:100%;border-collapse:collapse;font-size:13px}
-        .preview-table thead{background:var(--light-blue);border-bottom:2px solid var(--border-color);position:sticky;top:0}
-        .preview-table th{padding:12px 16px;text-align:left;font-weight:700;color:var(--primary-blue)}
-        .preview-table td{padding:12px 16px;border-bottom:1px solid var(--border-color)}
-        .status-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase}
-        .status-valid{background:#d1fae5;color:var(--primary-green)}.status-invalid{background:#fee2e2;color:var(--error-color)}
-        .button{padding:12px 24px;border:2px solid var(--border-color);border-radius:8px;background:white;cursor:pointer;font-size:14px;font-weight:700;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.5px}
-        .button-primary{background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);color:white;border:none}
-        .button-success{background:linear-gradient(135deg,var(--primary-green) 0%,#1b5e20 100%);color:white;border:none}
-        .file-info{background:var(--light-green);border-left:4px solid var(--primary-green);padding:12px;border-radius:6px;margin-bottom:1.5rem;display:none}
-        .file-info.show{display:block}
-        .stats-container{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;padding:1rem;background:var(--light-blue);border-radius:8px;margin-bottom:1.5rem}
-        .stat-item{text-align:center}
-        .stat-item-value{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--primary-blue)}
-        .stat-item-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-top:4px}
-        .recent-item{margin-bottom:12px;padding:12px;background:var(--light-blue);border-radius:8px;border-left:4px solid var(--primary-green)}
-        .recent-item strong{font-size:14px;color:var(--primary-blue);display:block;margin-bottom:4px}
-        .recent-item p{font-size:11px;color:var(--text-secondary);margin:2px 0}
-        .attachment-zone{border:2px dashed var(--border-color);border-radius:10px;padding:1.5rem;text-align:center;background:#fafafa;cursor:pointer;transition:all 0.3s;margin-bottom:1rem}
-        .attachment-zone:hover,.attachment-zone.dragover{background:var(--light-blue);border-color:var(--primary-blue)}
-        .attachment-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-        .attachment-item{display:flex;align-items:center;gap:10px;background:var(--light-blue);border:1px solid var(--border-color);border-radius:8px;padding:10px 14px;font-size:13px}
-        .attachment-item-info{flex:1;overflow:hidden}
-        .attachment-item-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .attachment-item-size{font-size:11px;color:var(--text-secondary);margin-top:2px}
-        .attachment-remove-btn{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--error-color);padding:2px 6px;border-radius:4px}
-        .attachment-summary{font-size:12px;color:var(--text-secondary);padding:6px 10px;background:white;border-radius:6px;border:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center}
-        @media(max-width:1024px){.grid-2,.grid-3{grid-template-columns:1fr}}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #004687 0%, #0b6e35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #004687;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .filter-section label {
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+        }
+
+        select:hover {
+            border-color: #004687;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #004687;
+            box-shadow: 0 0 0 2px rgba(0,70,135,0.1);
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 13px;
+            color: #333;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-complied {
+            background: #e0f2f1;
+            color: #00695c;
+        }
+
+        /* Regulator Badge */
+        .regulator-badge {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* Button */
+        button {
+            background: #004687;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #003558;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #004687;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+
+            button {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        .api-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
-
-<!-- Login Screen -->
-<div id="loginScreen" class="login-container">
-    <div class="login-card">
-        <div style="text-align:center;margin-bottom:1rem;">
-            <p style="font-size:13px;color:var(--text-secondary);font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem;">EMAIL CAMPAIGN MANAGER</p>
-            <img src="/logo.png" alt="Trugydex" style="max-width:200px;width:100%;height:auto;" />
-        </div>
-        <div class="login-tabs">
-            <button class="login-tab-btn active" onclick="switchLoginTab('login',this)">Login</button>
-            <button class="login-tab-btn" onclick="switchLoginTab('signup',this)">Signup</button>
-        </div>
-        <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group"><label class="form-label">User ID</label><input type="text" id="loginEmail" placeholder="Enter your User ID" required /></div>
-            <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" placeholder="••••••••" required /></div>
-            <button type="submit" class="button-login">Login</button>
-        </form>
-        <form class="login-form" id="signupForm" onsubmit="handleSignup(event)">
-            <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="signupName" placeholder="Your Full Name" required /></div>
-            <div class="form-group"><label class="form-label">User ID</label><input type="text" id="signupEmail" placeholder="e.g. EMP001" required /></div>
-            <div class="form-group"><label class="form-label">Password</label><input type="password" id="signupPassword" placeholder="Min 6 characters" required /></div>
-            <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="signupConfirm" placeholder="Confirm password" required /></div>
-            <button type="submit" class="button-login">Create Account</button>
-        </form>
-    </div>
-</div>
-
-<!-- Dashboard -->
-<div id="dashboardScreen" class="dashboard">
-    <div class="top-bar">
-        <div><img src="/logo.png" alt="Trugydex" style="height:36px;width:auto;filter:brightness(0) invert(1);" /></div>
-        <div class="top-bar-user">
-            <div class="user-avatar" id="userInitials">A</div>
-            <div class="user-info"><div class="name" id="currentUserName">Admin</div><div class="role" id="currentUserRole">Administrator</div></div>
-            <button class="logout-btn" onclick="handleLogout()">Logout</button>
-        </div>
-    </div>
-    <div class="header">
-        <h1>Welcome to Campaign Manager</h1>
-        <p>Upload email lists, send bulk campaigns, and track results</p>
-    </div>
     <div class="container">
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('dashboard',event)">Dashboard</button>
-            <button class="nav-tab" onclick="switchTab('upload',event)">&#128229; Bulk Upload</button>
-            <button class="nav-tab" onclick="switchTab('compose',event)">Send Email</button>
-            <button class="nav-tab" onclick="switchTab('history',event)">History</button>
-            <button class="nav-tab" id="userLogTab" onclick="switchTab('userlog',event)" style="display:none;">&#128101; User Log <span id="pendingBadge" style="display:none;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:4px;">0</span></button>
-        </div>
+        <!-- Header -->
+        <header>
+            <h1>🎯 TrugyDex Regulatory Hub</h1>
+            <p>Multi-Source Circular Fetcher & AI Interpreter</p>
+        </header>
 
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-panel active">
-            <div class="grid-3">
-                <div class="stat-card"><div class="stat-label">Total Groups</div><div class="stat-value" id="totalGroups">0</div></div>
-                <div class="stat-card"><div class="stat-label">Total Recipients</div><div class="stat-value" id="totalRecipients">0</div></div>
-                <div class="stat-card"><div class="stat-label">Emails Sent</div><div class="stat-value" id="emailsSent">0</div></div>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total Circulars</div>
             </div>
-            <div class="card"><div class="card-title">Quick Start Guide</div>
-                <div class="alert alert-info"><strong>Getting Started:</strong><br>1&#65039;&#8419; Go to "Bulk Upload" tab<br>2&#65039;&#8419; Upload CSV or Excel file with emails<br>3&#65039;&#8419; Create a group from the uploaded list<br>4&#65039;&#8419; Go to "Send Email" tab<br>5&#65039;&#8419; Write your message body only<br>6&#65039;&#8419; Click "Send Campaign" — Dear [Name] is added automatically!</div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCount">0</div>
+                <div class="stat-label">Active Items</div>
             </div>
-            <div class="card"><div class="card-title">Recent Groups</div><div id="recentActivity"><p style="color:var(--text-secondary);font-size:14px;">No groups created yet.</p></div></div>
-        </div>
-
-        <!-- Bulk Upload Tab -->
-        <div id="upload" class="tab-panel">
-            <div style="background:#fff;border:2px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
-                <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--primary-blue);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:2px solid var(--light-blue);">&#128203; How to Prepare Your Email List</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-                    <div>
-                        <div style="font-size:13px;font-weight:700;color:var(--primary-blue);margin-bottom:0.75rem;text-transform:uppercase;">Step by Step</div>
-                        <div style="font-size:13px;line-height:2;">
-                            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);">1&#65039;&#8419; Open <strong>Microsoft Excel</strong> or <strong>Google Sheets</strong></div>
-                            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);">2&#65039;&#8419; Row 1: <code style="background:#f0f4f9;padding:2px 8px;border-radius:4px;color:var(--primary-blue);">Email</code> in column A, <code style="background:#f0f4f9;padding:2px 8px;border-radius:4px;color:var(--primary-blue);">Name</code> in column B</div>
-                            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);">3&#65039;&#8419; From Row 2 — enter emails and names</div>
-                            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);">4&#65039;&#8419; Save as <strong>.csv</strong> or <strong>.xlsx</strong></div>
-                            <div style="padding:6px 0;">5&#65039;&#8419; Upload here</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div style="font-size:13px;font-weight:700;color:var(--primary-blue);margin-bottom:0.75rem;text-transform:uppercase;">Example Format</div>
-                        <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                            <thead><tr style="background:var(--primary-blue);color:white;"><th style="padding:8px 12px;">Email</th><th style="padding:8px 12px;">Name</th></tr></thead>
-                            <tbody>
-                                <tr style="background:var(--light-blue);"><td style="padding:7px 12px;">jay@gmail.com</td><td style="padding:7px 12px;">Jay</td></tr>
-                                <tr><td style="padding:7px 12px;">sweetu@gmail.com</td><td style="padding:7px 12px;">Sweetu</td></tr>
-                                <tr style="background:var(--light-blue);"><td style="padding:7px 12px;">samir@gmail.com</td><td style="padding:7px 12px;">Samir</td></tr>
-                            </tbody>
-                        </table>
-                        <button onclick="downloadSampleCSV()" style="margin-top:12px;width:100%;padding:10px;background:linear-gradient(135deg,var(--primary-green),#1b5e20);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">&#11015;&#65039; Download Sample CSV</button>
-                    </div>
-                </div>
-                <div style="margin-top:1rem;padding:12px;background:#fff8e1;border-left:4px solid #f59e0b;border-radius:6px;font-size:12px;">
-                    <strong style="color:#92400e;">&#9888;&#65039; Important:</strong> <span style="color:#78350f;">First row MUST have headers (Email, Name) | Supported: CSV, XLSX, XLS | Max 500 emails recommended</span>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value" id="compliedCount">0</div>
+                <div class="stat-label">Complied</div>
             </div>
-            <div class="alert alert-info"><strong>&#128193; Upload Email Lists:</strong> Drag &amp; drop or click to upload CSV/Excel files.</div>
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title">Import Email List</div>
-                    <div class="upload-zone" id="uploadZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('fileInput').click()">
-                        <div class="upload-zone-icon">&#128193;</div>
-                        <h3 style="font-size:16px;font-weight:600;margin-bottom:0.5rem;color:var(--primary-blue);">Drag &amp; drop your file here</h3>
-                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:1rem;">or click to browse</p>
-                        <span style="display:inline-block;background:white;padding:8px 16px;border-radius:6px;font-size:12px;color:var(--primary-green);font-weight:600;">CSV &bull; XLSX &bull; XLS</span>
-                    </div>
-                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleFileSelect(event)" />
-                    <div id="fileInfo" class="file-info"><strong>&#128196; File Loaded:</strong><p>Name: <strong id="fileName"></strong></p><p>Rows: <strong id="rowCount">0</strong></p></div>
-                    <div class="form-group"><label class="form-label">Email Column</label><select id="emailColumn" onchange="showUploadPreview()"><option value="">Auto-detect...</option></select></div>
-                    <div class="form-group"><label class="form-label">Name Column (Optional)</label><select id="nameColumn" onchange="showUploadPreview()"><option value="">No name column</option></select></div>
-                    <div class="form-group"><label class="form-label">Group Name</label><input type="text" id="uploadGroupName" placeholder="e.g., Q1 Marketing List" /></div>
-                    <div class="form-group"><label class="form-label">Description</label><input type="text" id="uploadGroupDesc" placeholder="Optional description" /></div>
-                    <button class="button button-primary" onclick="createGroupFromUpload()" style="width:100%;padding:12px;">Create Group from Upload</button>
-                </div>
-                <div class="card">
-                    <div class="card-title">Preview</div>
-                    <div id="previewEmpty" style="color:var(--text-secondary);font-size:14px;text-align:center;padding:2rem;"><p style="font-size:3rem;margin-bottom:1rem;">&#128203;</p><p>Upload a file to see preview</p></div>
-                    <div id="previewData" style="display:none;">
-                        <div class="stats-container">
-                            <div class="stat-item"><div class="stat-item-value" id="previewValidCount">0</div><div class="stat-item-label">Valid Emails</div></div>
-                            <div class="stat-item"><div class="stat-item-value" id="previewInvalidCount">0</div><div class="stat-item-label">Invalid Emails</div></div>
-                        </div>
-                        <div class="preview-table-container">
-                            <div class="table-header">Email Preview (First 10 rows)</div>
-                            <table class="preview-table"><thead><tr><th style="width:40%;">Email</th><th style="width:40%;">Name</th><th style="width:20%;">Status</th></tr></thead><tbody id="previewTableBody"></tbody></table>
-                        </div>
-                    </div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value" id="apiStatus" style="color: #0b6e35;">●</div>
+                <div class="stat-label">API Status</div>
             </div>
         </div>
 
-        <!-- Compose Tab -->
-        <div id="compose" class="tab-panel">
-            <div class="alert alert-info"><strong>&#128161; Pro Tip:</strong> Upload email lists first in "Bulk Upload" tab. <strong>Dear [Name]</strong> is automatically added to every email — just write the body content!</div>
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title">Campaign Configuration</div>
-                    <div class="form-group"><label class="form-label">Select Recipient Group</label><select id="selectGroup" onchange="updateGroupPreview()"><option value="">Choose a group...</option></select></div>
-                    <div class="form-group"><label class="form-label">Campaign Name</label><input type="text" id="campaignName" placeholder="e.g., Q1 Newsletter" /></div>
-                    <div class="form-group"><label class="form-label">Subject Line</label><input type="text" id="emailSubject" placeholder="Enter subject" /></div>
-                    <div class="form-group">
-                        <label class="form-label">Email Body</label>
-                        <div style="background:#eff6ff;border-left:3px solid var(--primary-blue);padding:8px 12px;border-radius:4px;margin-bottom:8px;font-size:12px;color:var(--primary-blue);">
-                            &#128276; <strong>Dear {name},</strong> is automatically added at the top of every email.<br>
-                            Just write your message below. Use <code style="background:white;padding:1px 5px;border-radius:3px;">{name}</code> or <code style="background:white;padding:1px 5px;border-radius:3px;">{email}</code> anywhere in body too.
-                        </div>
-                        <textarea id="emailBody" placeholder="Write your message here...&#10;&#10;e.g. We are pleased to inform you about our latest compliance update.&#10;&#10;Regards,&#10;Trugydex Team"></textarea>
-                    </div>
-                    <!-- Editable Signature -->
-                    <div class="form-group">
-                        <label class="form-label">&#9999;&#65039; Email Signature <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">(editable — auto added to every email)</span></label>
-                        <div style="background:#f8f9fa;border:2px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:10px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                                <div><label style="font-size:11px;font-weight:700;color:var(--primary-blue);text-transform:uppercase;display:block;margin-bottom:4px;">Name</label><input type="text" id="sigName" value="Trugydex Compliance" oninput="updateSignaturePreview()" style="padding:8px 10px;font-size:13px;" /></div>
-                                <div><label style="font-size:11px;font-weight:700;color:var(--primary-blue);text-transform:uppercase;display:block;margin-bottom:4px;">Title</label><input type="text" id="sigTitle" value="SAHI SALAH SUCHAN" oninput="updateSignaturePreview()" style="padding:8px 10px;font-size:13px;" /></div>
-                            </div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                                <div><label style="font-size:11px;font-weight:700;color:var(--primary-blue);text-transform:uppercase;display:block;margin-bottom:4px;">Email</label><input type="text" id="sigEmail" value="trugydexcompliance@gmail.com" oninput="updateSignaturePreview()" style="padding:8px 10px;font-size:13px;" /></div>
-                                <div><label style="font-size:11px;font-weight:700;color:var(--primary-blue);text-transform:uppercase;display:block;margin-bottom:4px;">Website</label><input type="text" id="sigWebsite" value="www.trugydex.in" oninput="updateSignaturePreview()" style="padding:8px 10px;font-size:13px;" /></div>
-                            </div>
-                            <div><label style="font-size:11px;font-weight:700;color:var(--primary-blue);text-transform:uppercase;display:block;margin-bottom:4px;">Phone (optional)</label><input type="text" id="sigPhone" placeholder="+91 98765 43210" oninput="updateSignaturePreview()" style="padding:8px 10px;font-size:13px;" /></div>
-                        </div>
-                        <div style="border:2px solid var(--border-color);border-radius:8px;padding:14px;background:#fff;">
-                            <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;">Live Preview</div>
-                            <table style="width:100%;border-top:2px solid #003087;padding-top:12px;"><tr>
-                                <td style="vertical-align:middle;padding-right:14px;width:110px;"><img src="/logo.png" alt="Trugydex" style="width:100px;height:auto;" /></td>
-                                <td style="vertical-align:middle;border-left:2px solid #e0e0e0;padding-left:14px;">
-                                    <p id="sigPreviewName" style="margin:0;font-size:13px;font-weight:700;color:#003087;">Trugydex Compliance</p>
-                                    <p id="sigPreviewTitle" style="margin:3px 0 0;font-size:11px;color:#666;">SAHI SALAH SUCHAN</p>
-                                    <p id="sigPreviewPhone" style="margin:3px 0 0;font-size:11px;color:#666;display:none;"></p>
-                                    <p id="sigPreviewEmail" style="margin:3px 0 0;font-size:11px;color:#666;">trugydexcompliance@gmail.com</p>
-                                    <p id="sigPreviewWebsite" style="margin:3px 0 0;font-size:11px;color:#666;">www.trugydex.in</p>
-                                </td>
-                            </tr></table>
-                        </div>
-                    </div>
-                    <!-- Attachments -->
-                    <div class="form-group">
-                        <label class="form-label">&#128206; Attachments</label>
-                        <div class="attachment-zone" id="attachmentZone" ondrop="handleAttachmentDrop(event)" ondragover="handleAttachmentDragOver(event)" ondragleave="handleAttachmentDragLeave(event)" onclick="document.getElementById('attachmentInput').click()">
-                            <div style="font-size:2rem;margin-bottom:0.5rem;">&#128206;</div>
-                            <p><strong>Click or drag &amp; drop files here</strong></p>
-                            <p style="margin-top:4px;">Max 5 files &bull; 10 MB each</p>
-                        </div>
-                        <input type="file" id="attachmentInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.zip,.ppt,.pptx" style="display:none;" onchange="handleAttachmentSelect(event)" />
-                        <div style="font-size:11px;color:var(--text-secondary);">Supported: PDF, Word, Excel, CSV, Images, ZIP, PPT, TXT</div>
-                        <div class="attachment-list" id="attachmentList" style="margin-top:12px;"></div>
-                        <div id="attachmentSummary" style="display:none;" class="attachment-summary">
-                            <span id="attachmentCountText">0 file(s)</span>
-                            <span id="attachmentSizeText">0 KB</span>
-                            <button onclick="clearAllAttachments()" style="background:none;border:none;color:var(--error-color);cursor:pointer;font-size:12px;font-weight:600;">&#10005; Clear All</button>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Send Delay (seconds)</label><input type="number" id="sendDelay" value="2" min="1" max="30" /><small style="color:var(--text-secondary);font-size:12px;margin-top:6px;display:block;">Recommended: 2-5 seconds</small></div>
-                    <button class="button-login" onclick="sendEmail()" style="width:100%;padding:14px;">Send Campaign</button>
-                </div>
-                <div class="card">
-                    <div class="card-title">Campaign Preview</div>
-                    <div style="background:linear-gradient(135deg,var(--light-blue) 0%,var(--light-green) 100%);border-radius:10px;padding:1.5rem;border:2px solid var(--primary-blue);">
-                        <div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--primary-blue);font-weight:700;text-transform:uppercase;">Recipients:</div><div style="font-size:13px;margin-top:6px;padding:8px 12px;background:white;border-radius:6px;" id="previewRecipients">No group selected</div></div>
-                        <div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--primary-blue);font-weight:700;text-transform:uppercase;">Subject:</div><div style="font-size:13px;margin-top:6px;padding:8px 12px;background:white;border-radius:6px;" id="previewSubject">-</div></div>
-                        <div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--primary-blue);font-weight:700;text-transform:uppercase;">Sample Email:</div><div style="font-size:12px;margin-top:8px;max-height:150px;overflow-y:auto;white-space:pre-wrap;background:white;padding:12px;border-radius:6px;" id="previewBody">-</div></div>
-                        <div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--primary-blue);font-weight:700;text-transform:uppercase;">Est. Send Time:</div><div style="font-size:13px;margin-top:6px;padding:8px 12px;background:white;border-radius:6px;" id="estimatedTime">-</div></div>
-                        <div><div style="font-size:11px;color:var(--primary-blue);font-weight:700;text-transform:uppercase;">Attachments:</div><div style="font-size:13px;margin-top:6px;padding:8px 12px;background:white;border-radius:6px;" id="previewAttachments">None</div></div>
-                    </div>
-                </div>
-            </div>
+        <!-- Filter -->
+        <div class="filter-section">
+            <label for="regulatorFilter">Filter by Regulator:</label>
+            <select id="regulatorFilter" onchange="filterCirculars()">
+                <option value="all">All Regulators</option>
+                <option value="NSE">NSE - National Stock Exchange</option>
+                <option value="BSE">BSE - Bombay Stock Exchange</option>
+                <option value="MCX">MCX - Multi Commodity Exchange</option>
+                <option value="NCDEX">NCDEX - Agricultural Commodities</option>
+                <option value="SEBI">SEBI - Securities Board</option>
+                <option value="APMI">APMI - Portfolio Managers</option>
+                <option value="MCA">MCA - Corporate Affairs</option>
+                <option value="GST">GST - Tax Authority</option>
+            </select>
         </div>
 
-        <!-- History Tab -->
-        <div id="history" class="tab-panel">
-            <div class="card"><div class="card-title">Campaign History</div><div id="campaignHistory"><p style="color:var(--text-secondary);font-size:14px;">No campaigns sent yet</p></div></div>
+        <!-- Error Message -->
+        <div id="errorMessage" style="display: none;" class="error-message"></div>
+
+        <!-- Loading State -->
+        <div id="loadingState" style="display: none;" class="loading">
+            <div class="spinner"></div>
+            <p>Loading circulars...</p>
         </div>
 
-        <!-- User Log Tab -->
-        <div id="userlog" class="tab-panel">
-            <div class="grid-3" style="margin-bottom:1.5rem;">
-                <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsersCount">0</div></div>
-                <div class="stat-card" style="border:2px solid #fbbf24;"><div class="stat-label" style="color:#92400e;">&#9203; Pending</div><div class="stat-value" style="color:#92400e;" id="pendingUsersCount">0</div></div>
-                <div class="stat-card" style="border:2px solid #d1fae5;"><div class="stat-label">&#10003; Approved</div><div class="stat-value" id="approvedUsersCount">0</div></div>
-            </div>
-            <div class="card">
-                <div class="card-title">&#128101; User Access Management</div>
-                <div class="alert alert-info"><strong>Admin Control:</strong> Approve or reject user access. Pending users cannot login until approved.</div>
-                <div class="preview-table-container" style="max-height:500px;">
-                    <div class="table-header">User Registry</div>
-                    <table class="preview-table">
-                        <thead><tr><th style="width:4%;">#</th><th style="width:18%;">Full Name</th><th style="width:24%;">Email</th><th style="width:12%;">Role</th><th style="width:10%;">Status</th><th style="width:16%;">Registered</th><th style="width:16%;">Action</th></tr></thead>
-                        <tbody id="userLogTableBody"></tbody>
-                    </table>
-                </div>
-                <div style="margin-top:1rem;display:flex;gap:1.5rem;font-size:13px;color:var(--text-secondary);">
-                    <span>Total: <strong id="totalUsersCount2" style="color:var(--primary-blue);">&#8212;</strong></span>
-                    <span style="color:#ef4444;">Rejected: <strong id="rejectedUsersCount">0</strong></span>
-                </div>
-            </div>
+        <!-- Table -->
+        <div class="table-container" id="tableContainer" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Regulator</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="circularsTable">
+                    <!-- Will be populated by JavaScript -->
+                </tbody>
+            </table>
         </div>
 
+        <!-- Empty State -->
+        <div id="emptyState" style="display: none;" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No circulars found</p>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <span class="api-status"></span> TrugyDex Platform | Last Updated: <span id="lastUpdate">--:--:--</span>
+        </footer>
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-<script src="/app.js"></script>
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:3000'; // Change in production
+        const API_KEY = 'test-key-123'; // Use environment variable in production
+
+        // State
+        let allCirculars = [];
+        let filteredCirculars = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCirculars();
+            setInterval(updateLastUpdate, 1000);
+        });
+
+        // Load circulars from API
+        async function loadCirculars() {
+            showLoading(true);
+            hideError();
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/circulars/all?limit=100`, {
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                allCirculars = data.data.circulars || [];
+                filteredCirculars = allCirculars;
+
+                updateStats();
+                renderTable();
+                setAPIStatus(true);
+            } catch (error) {
+                console.error('Error loading circulars:', error);
+                showError(`Error loading circulars: ${error.message}`);
+                setAPIStatus(false);
+                showEmpty();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Filter circulars by regulator
+        function filterCirculars() {
+            const selectedRegulator = document.getElementById('regulatorFilter').value;
+
+            if (selectedRegulator === 'all') {
+                filteredCirculars = allCirculars;
+            } else {
+                filteredCirculars = allCirculars.filter(c => 
+                    (c.regulator_code || c.regulator || '').toUpperCase() === selectedRegulator
+                );
+            }
+
+            renderTable();
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('circularsTable');
+            const tableContainer = document.getElementById('tableContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredCirculars.length === 0) {
+                tableContainer.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            tableContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            tbody.innerHTML = filteredCirculars.map((circular, index) => `
+                <tr>
+                    <td><strong>${circular.circular_number || 'N/A'}</strong></td>
+                    <td>${circular.title || 'No title'}</td>
+                    <td><span class="regulator-badge">${circular.regulator_code || 'N/A'}</span></td>
+                    <td>${new Date(circular.published_date).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge status-${circular.status || 'pending'}">
+                            ${circular.status || 'pending'}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="getInterpretation('${circular.id}')">Interpret</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Get AI interpretation
+        async function getInterpretation(circularId) {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/interpret`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        circular_id: circularId,
+                        interpretation_type: 'full',
+                        audience: 'broker'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const interpretation = data.data.interpretation;
+
+                alert(`AI Interpretation:\n\n${JSON.stringify(interpretation, null, 2)}`);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allCirculars.length;
+            document.getElementById('activeCount').textContent = 
+                allCirculars.filter(c => c.status === 'active').length;
+            document.getElementById('compliedCount').textContent = 
+                allCirculars.filter(c => c.status === 'complied').length;
+        }
+
+        // UI Helpers
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showEmpty() {
+            document.getElementById('tableContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function setAPIStatus(isOnline) {
+            const statusDiv = document.getElementById('apiStatus');
+            if (isOnline) {
+                statusDiv.textContent = '●';
+                statusDiv.style.color = '#0b6e35';
+            } else {
+                statusDiv.textContent = '●';
+                statusDiv.style.color = '#d32f2f';
+            }
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadCirculars, 5 * 60 * 1000);
+    </script>
 </body>
 </html>
